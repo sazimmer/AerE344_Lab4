@@ -25,6 +25,25 @@ for(i in seq_along(data_files)) {
   temp_data <- read.csv(paste0(getwd(), "/Data/", data_files[i]), stringsAsFactors = FALSE)
   #Creates a temporary object to store the current data.
   assign(paste0("data", gsub("([[:alnum:]]+)[[:punct:]][[:alpha:]]{3}", "\\1", data_files[i])),
-         temp_data, envir = .GlobalEnv)
+         temp_data[,-1], envir = .GlobalEnv)
+  #temp_data[,-1] removes the frame column that is merely a row counter.
   rm(list = ls(pattern = "^temp_"))
+}
+
+rm(data_files, i)
+
+#### Known and Measured Values ####
+diam <- 0.7 #Diameter of the cylinder in inches
+K <- 1.1 #Calibration constant
+
+#### Data Processing ####
+#Remove the outliers, which should be very extreme values. To find them, I will attempt removing all values
+#that are 3 times more or less than the standard deviation.
+dataNames <- ls(pattern = "^data")
+#A vector of the data names. The data_files vector served a different purpose to this.
+
+stddev <- matrix(data = NA, nrow = 8, ncol = 32, dimnames = list(dataNames, colnames(get(dataNames[1]))))
+#Makes an empty matrix 
+for(i in seq_along(dataNames)) {
+  sapply(X = seq_along(colnames(get(dataNames[i]))), FUN = function(X) sd(get(dataNames[i])[,X]))
 }
