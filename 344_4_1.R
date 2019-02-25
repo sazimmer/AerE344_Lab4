@@ -45,5 +45,8 @@ dataNames <- ls(pattern = "^data")
 stddev <- matrix(data = NA, nrow = 8, ncol = 32, dimnames = list(dataNames, colnames(get(dataNames[1]))))
 #Makes an empty matrix 
 for(i in seq_along(dataNames)) {
-  sapply(X = seq_along(colnames(get(dataNames[i]))), FUN = function(X) sd(get(dataNames[i])[,X]))
+  stddev[i,] <- sapply(X = seq_along(colnames(get(dataNames[i]))), FUN = function(X) sd(get(dataNames[i])[,X]))
 }
+
+#To remove the columns exceeding 3x the standard deviation, I need to make a boolean vector of all columns in all sets.
+#To make the vectors, I can try sapply(X = ..., FUN = function(X) dataNHz[,X] > stddev[dataNHz,X])
