@@ -46,7 +46,19 @@ stddev <- matrix(data = NA, nrow = 8, ncol = 32, dimnames = list(dataNames, coln
 #Makes an empty matrix 
 for(i in seq_along(dataNames)) {
   stddev[i,] <- sapply(X = seq_along(colnames(get(dataNames[i]))), FUN = function(X) sd(get(dataNames[i])[,X]))
-}
+} #Fills previous matrix
+
+rm(i)
 
 #To remove the columns exceeding 3x the standard deviation, I need to make a boolean vector of all columns in all sets.
 #To make the vectors, I can try sapply(X = ..., FUN = function(X) dataNHz[,X] > stddev[dataNHz,X])
+
+datafilter <- array(data = NA, dim = c(nrow(data0Hz), ncol(data0Hz), length(dataNames)))
+#Makes an empty array of the same size as the data, with as many matrices as there is data.
+for(i in seq_along(dataNames)) {
+  datafilter[,,i] <- sapply(X = seq_along(colnames(get(dataNames[i]))), FUN = function(X)
+    {get(dataNames[i])[,X] <= 3*stddev[i,X]}) #Check if the data is within desired range.
+}
+#An array is a three-dimensional matrix. It essentially stores one or more matrices.
+#If I want row 1, column 2 of matrix 3, then I call it with array[1,2,3].
+
