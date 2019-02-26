@@ -106,3 +106,13 @@ for(i in seq_len(nrow(avg))) {
   avg[i,] <- avg[i,] - zeroLvl
 }
 cavg <- colMeans(avg) #Average of all data of all runs.
+write.csv(cavg, file = "Storage/all_data_averaged.csv") #average of all data over all runs
+
+#Column 19 is A pressure, column 20 is E pressure
+#Plot pressure coefficient on the cylinder
+pcoef <- matrix(data = NA, nrow = nrow(avg), ncol = ncol(avg))
+for(i in seq_len(nrow(avg))) {
+  for(j in seq_len(18)) {
+    pcoef[i,j] <- (avg[i,j] - avg[i,20]) / (K * (avg[i,19] - avg[i,20]))
+  }
+}
