@@ -84,8 +84,25 @@ rm(i)
 
 save(list = ls(pattern = "^data[0-9]+Hz$"), file = "Storage/unprocessedData.RData")
 #Saving the original data containing outliers to an RData file.
-rm(list = ls(pattern = "^data[0-9]+Hz$"))
+rm(list = ls(pattern = "^data"))
 #Removing the unprocessed data from the environment for simplicity.
 
 deltaA <- as.single(20 * d2r) #The difference in angles from adjacent ports is 20 degrees, converted to radians.
 #Using single-precision floating point as double-precision is overkill.
+pdataNames <- ls(pattern = "^pdata")
+
+avg <- matrix(data = NA, nrow = 8, ncol = 32, dimnames = list(pdataNames, colnames(get(pdataNames[1]))))
+#Makes an empty matrix
+#stddev is the standard deviation and bsln (baseline) is the average
+for(i in seq_along(pdataNames)) {
+  avg[i,] <- sapply(X = seq_along(colnames(get(pdataNames[i]))), FUN = function(X) mean(get(pdataNames[i])[,X]))
+} #Fills previous matrix
+rm(i)
+
+zeroLvl <- avg[1,] #The zero pressure levels for all sensors.
+#avg <- apply(avg, 1, '-', zeroLvl)
+#avg <- sweep(avg, 1, zeroLvl, '-')
+for(i in seq_len(nrow(avg))) {
+  avg[i,] <- avg[i,] - zeroLvl
+}
+cavg <- colMeans(avg) #Average of all data of all runs.
