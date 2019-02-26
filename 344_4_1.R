@@ -49,8 +49,8 @@ bsln <- matrix(data = NA, nrow = 8, ncol = 32, dimnames = list(dataNames, colnam
 #Makes an empty matrix
 #stddev is the standard deviation and bsln (baseline) is the average
 for(i in seq_along(dataNames)) {
-  stddev[i,] <- sapply(X = seq_along(colnames(get(dataNames[i]))), FUN = function(X) sd(get(dataNames[i])[,X], na.rm = TRUE))
-  bsln[i,] <- sapply(X = seq_along(colnames(get(dataNames[i]))), FUN = function(X) mean(get(dataNames[i])[,X], na.rm = TRUE))
+  stddev[i,] <- sapply(X = seq_along(colnames(get(dataNames[i]))), FUN = function(X) sd(get(dataNames[i])[,X]))
+  bsln[i,] <- sapply(X = seq_along(colnames(get(dataNames[i]))), FUN = function(X) mean(get(dataNames[i])[,X]))
 } #Fills previous matrix
 
 rm(i)
