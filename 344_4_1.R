@@ -17,6 +17,8 @@ rm(list = ls()) #Clear the global environment
 #### Functions, packages, and conversions ####
 "%e%" <- function(a,b) {a*10^(b)}
 #A function made by me to make it easier to enter big and small numbers.
+library(ggplot2)
+d2r <- pi/180 #degrees to radians
 
 #### Data Collection ####
 data_files <- list.files(path = paste0(getwd(), "/Data"))
@@ -43,9 +45,12 @@ dataNames <- ls(pattern = "^data")
 #A vector of the data names. The data_files vector served a different purpose to this.
 
 stddev <- matrix(data = NA, nrow = 8, ncol = 32, dimnames = list(dataNames, colnames(get(dataNames[1]))))
-#Makes an empty matrix 
+bsln <- matrix(data = NA, nrow = 8, ncol = 32, dimnames = list(dataNames, colnames(get(dataNames[1]))))
+#Makes an empty matrix
+#stddev is the standard deviation and bsln (baseline) is the average
 for(i in seq_along(dataNames)) {
-  stddev[i,] <- sapply(X = seq_along(colnames(get(dataNames[i]))), FUN = function(X) sd(get(dataNames[i])[,X]))
+  stddev[i,] <- sapply(X = seq_along(colnames(get(dataNames[i]))), FUN = function(X) sd(get(dataNames[i])[,X], na.rm = TRUE))
+  bsln[i,] <- sapply(X = seq_along(colnames(get(dataNames[i]))), FUN = function(X) mean(get(dataNames[i])[,X], na.rm = TRUE))
 } #Fills previous matrix
 
 rm(i)
@@ -57,7 +62,8 @@ datafilter <- array(data = NA, dim = c(nrow(data0Hz), ncol(data0Hz), length(data
 #Makes an empty array of the same size as the data, with as many matrices as there is data.
 for(i in seq_along(dataNames)) {
   datafilter[,,i] <- sapply(X = seq_along(colnames(get(dataNames[i]))), FUN = function(X)
-    {get(dataNames[i])[,X] > 3*stddev[i,X]}) #Check if the data is within desired range.
+    {get(dataNames[i])[,X] > bsln[i,X]+(3*stddev[i,X]) || get(dataNames[i])[,X] < bsln[i,X]-(3*stddev[i,X])})
+  #Check if the data is within desired range.
 }
 #An array is a three-dimensional matrix. It essentially stores one or more matrices.
 #If I want row 1, column 2 of matrix 3, then I call it with array[1,2,3].
@@ -80,3 +86,6 @@ save(list = ls(pattern = "^data[0-9]+Hz$"), file = "Storage/unprocessedData.RDat
 #Saving the original data containing outliers to an RData file.
 rm(list = ls(pattern = "^data[0-9]+Hz$"))
 #Removing the unprocessed data from the environment for simplicity.
+
+deltaA <- as.single(20 * d2r) #The difference in angles from adjacent ports is 20 degrees, converted to radians.
+#Using single-precision floating point as double-precision is overkill.
