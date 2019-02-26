@@ -105,6 +105,7 @@ zeroLvl <- avg[1,] #The zero pressure levels for all sensors.
 for(i in seq_len(nrow(avg))) {
   avg[i,] <- avg[i,] - zeroLvl
 }
+rm(i)
 cavg <- colMeans(avg) #Average of all data of all runs.
 write.csv(cavg, file = "Storage/all_data_averaged.csv") #average of all data over all runs
 
@@ -116,3 +117,12 @@ for(i in seq_len(nrow(avg))) {
     pcoef[i,j] <- (avg[i,j] - avg[i,20]) / (K * (avg[i,19] - avg[i,20]))
   }
 }
+rm(i,j)
+
+ppcoef <- colMeans(pcoef[2:8,1:18])
+#ggplot(data = data.frame(Run_Length = c("1", "2", "10"), Standard_Deviation = stddev),
+#       aes(x = Run_Length, y = Standard_Deviation, fill = Standard_Deviation)) +
+#  geom_bar(stat = "identity")
+ggplot(data = data.frame(P_Coefficient = ppcoef, Angle = seq(0, 2*pi, length.out = 18)),
+       aes(y = P_Coefficient, x = Angle)) +
+  geom_point()
