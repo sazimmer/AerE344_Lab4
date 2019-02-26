@@ -57,8 +57,26 @@ datafilter <- array(data = NA, dim = c(nrow(data0Hz), ncol(data0Hz), length(data
 #Makes an empty array of the same size as the data, with as many matrices as there is data.
 for(i in seq_along(dataNames)) {
   datafilter[,,i] <- sapply(X = seq_along(colnames(get(dataNames[i]))), FUN = function(X)
-    {get(dataNames[i])[,X] <= 3*stddev[i,X]}) #Check if the data is within desired range.
+    {get(dataNames[i])[,X] > 3*stddev[i,X]}) #Check if the data is within desired range.
 }
 #An array is a three-dimensional matrix. It essentially stores one or more matrices.
 #If I want row 1, column 2 of matrix 3, then I call it with array[1,2,3].
+rm(i)
 
+#Calculation to-do: average all data from all runs, plot pressure coefficient on the cylinder,
+#calculate drag coefficients, plot drag coefficients as a function of Reynolds number
+
+for(i in seq_along(dataNames)) {
+  temp_data <- get(dataNames[i])
+  temp_data[datafilter[,,i]] <- NA
+  #Where datafilter is TRUE, the element is replaced with NA.
+  assign(paste0("p", dataNames[i]), temp_data, envir = .GlobalEnv)
+  #The processed data will be saved as "pdataNHz"
+  rm(list = ls(pattern = "^temp_"))
+}
+rm(i)
+
+save(list = ls(pattern = "^data[0-9]+Hz$"), file = "Storage/unprocessedData.RData")
+#Saving the original data containing outliers to an RData file.
+rm(list = ls(pattern = "^data[0-9]+Hz$"))
+#Removing the unprocessed data from the environment for simplicity.
