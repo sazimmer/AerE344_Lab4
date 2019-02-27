@@ -31,7 +31,9 @@ airspd <- function(input) {
   output <- single(length(input))
   if(is.character(input)) {
     #Grabs the section of string(s) that contains a number before "Hz" (case insensitive).
-    input <- gsub("([0-9]+)Hz", "\\1", input, ignore.case = TRUE)
+    input <- gsub("[A-Za-z]+([0-9]+)Hz", "\\1", input, ignore.case = TRUE)
+    #print(input)
+    input <- as.numeric(input)
   }
   
   output <- 0.98158*input - 3.4962
@@ -149,3 +151,4 @@ ggplot(data = data.frame(P_Coefficient = ppcoef, Angle = seq(0, 2*pi, length.out
 
 #Calculate drag coefficients and plot drag coefficients as a function of Reynolds number -> Cd(R)
 #FIRST, calculate the velocity of the fluid in m/s using the results from lab 2.
+velo <- airspd(pdataNames)
