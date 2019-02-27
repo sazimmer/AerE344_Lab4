@@ -109,8 +109,8 @@ save(list = ls(pattern = "^data[0-9]+Hz$"), file = "Storage/unprocessedData.RDat
 rm(list = ls(pattern = "^data"))
 #Removing the unprocessed data from the environment for simplicity.
 
-deltaA <- as.single(20 * d2r) #The difference in angles from adjacent ports is 20 degrees, converted to radians.
-#Using single-precision floating point as double-precision is overkill.
+deltaA <- as.double(20 * d2r) #The difference in angles from adjacent ports is 20 degrees, converted to radians.
+#Double-precision floating-point may be necessary.
 pdataNames <- ls(pattern = "^pdata")
 
 avg <- matrix(data = NA, nrow = 8, ncol = 32, dimnames = list(pdataNames, colnames(get(pdataNames[1]))))
@@ -151,4 +151,20 @@ ggplot(data = data.frame(P_Coefficient = ppcoef, Angle = seq(0, 2*pi, length.out
 
 #Calculate drag coefficients and plot drag coefficients as a function of Reynolds number -> Cd(R)
 #FIRST, calculate the velocity of the fluid in m/s using the results from lab 2.
-velo <- airspd(pdataNames)
+velo <- airspd(pdataNames) #wind velocity in m/s
+p_ambient <- 992 %e% 2 #Pascals
+T_ambient <- 273.15 + 21.5 #Temperature in Kelvin
+R <- 287 #J/(kg*K)
+rho <- p_ambient / (R * T_ambient) #Ambient air density in kg/m^3
+rm(p_ambient, T_ambient, R)
+
+#I should make a function for calculating rho when T and P are known.
+#Need the drag coefficients from all runs, then compare each to the Reynolds number from said experiment.
+Dcoef <- numeric(nrow(pcoef)-1) #Numeric vector of length (# of runs) - 1 (to exclude the 0Hz run).
+for(i in seq_len(nrow(pcoef)-1)) {
+  fi <- pcoef[i+1,1:18] * cos(seq(0, 2*pi, length.out = 18))
+  Dcoef[i] <- -(deltaA/2)*sum(fi)
+}
+rm(i,fi)
+
+write.csv(Dcoef, file = "Storage/Drag_Coefficients.csv")
