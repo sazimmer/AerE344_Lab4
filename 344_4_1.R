@@ -168,3 +168,11 @@ for(i in seq_len(nrow(pcoef)-1)) {
 rm(i,fi)
 
 write.csv(Dcoef, file = "Storage/Drag_Coefficients.csv")
+
+#Finally, plot drag coefficients as a function of Reynolds number.
+Reyn <- (rho * velo[-1] * (0.7*2.54 %e% -2))
+
+ggplot(data.frame(DragCoef = Dcoef, Reynolds = Reyn), aes(x = Reynolds, y = DragCoef)) +
+  geom_point() +
+  xlab("Reynolds Number (unitless)") +
+  ylab("Drag Coefficient (unitless)")
