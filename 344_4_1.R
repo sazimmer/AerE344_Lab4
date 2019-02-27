@@ -20,6 +20,26 @@ rm(list = ls()) #Clear the global environment
 library(ggplot2)
 d2r <- pi/180 #degrees to radians
 
+airspd <- function(input) {
+  #This function takes the name of the data or a string and looks for the motor speed (in Hz).
+  #If a STRING is input, then it searches the string for the motor speed.
+  #If a numeric is input, then it uses the numbers for motor speed.
+  if(any(is.null(input))) stop("Input is missing!")
+  if(any(is.na(input))) stop("Input is missing!")
+  #Simple error catching.
+  
+  output <- single(length(input))
+  if(is.character(input)) {
+    #Grabs the section of string(s) that contains a number before "Hz" (case insensitive).
+    input <- gsub("([0-9]+)Hz", "\\1", input, ignore.case = TRUE)
+  }
+  
+  output <- 0.98158*input - 3.4962
+  output[output < 0] <- 0
+  #The fan should not run in reverse and the equation comes from experimentation.
+  return(output)
+}
+
 #### Data Collection ####
 data_files <- list.files(path = paste0(getwd(), "/Data"))
 
@@ -126,3 +146,6 @@ ppcoef <- colMeans(pcoef[2:8,1:18])
 ggplot(data = data.frame(P_Coefficient = ppcoef, Angle = seq(0, 2*pi, length.out = 18)),
        aes(y = P_Coefficient, x = Angle)) +
   geom_point()
+
+#Calculate drag coefficients and plot drag coefficients as a function of Reynolds number -> Cd(R)
+#FIRST, calculate the velocity of the fluid in m/s using the results from lab 2.
