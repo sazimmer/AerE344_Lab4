@@ -3,9 +3,11 @@
 #Section 6 Group 3
 #Lab 4
 
-setwd("E:/Stephen/Documents/R/College Files/Aer E 344 Lab 04")
+#setwd("E:/Stephen/Documents/R/College Files/Aer E 344 Lab 04")
 #Sets working directory, the place where the files are stored.
 #Above wd is for desktop.
+
+setwd("D:/Sam/Documents/AerE 344/AerE344_Lab4")
 
 rm(list = ls()) #Clear the global environment
 
@@ -150,9 +152,17 @@ ppcoef <- colMeans(pcoef[2:8,1:18])
 #ggplot(data = data.frame(Run_Length = c("1", "2", "10"), Standard_Deviation = stddev),
 #       aes(x = Run_Length, y = Standard_Deviation, fill = Standard_Deviation)) +
 #  geom_bar(stat = "identity")
-ggplot(data = data.frame(P_Coefficient = ppcoef, Angle = seq(0, 2*pi, length.out = 18)),
+ggplot(data = data.frame(P_Coefficient = ppcoef, Angle = seq(-pi, pi, length.out = 18)),
        aes(y = P_Coefficient, x = Angle)) +
-  geom_point()
+  geom_point() +
+  xlab("Angle (radians)") +
+  ylab("Pressure Coefficent (unitless)")
+
+ggplot(data = data.frame(Pco = pcoef[3,1:18], Angle = seq(-pi, pi, length.out = 18)),
+       aes(y = Pco, x = Angle)) +
+  geom_point() +
+  xlab("Angle (radians)") +
+  ylab("Pressure Coefficent (Unitless)")
 
 #Calculate drag coefficients and plot drag coefficients as a function of Reynolds number -> Cd(R)
 #FIRST, calculate the velocity of the fluid in m/s using the results from lab 2.
@@ -175,7 +185,7 @@ rm(i,fi)
 write.csv(Dcoef, file = "Storage/Drag_Coefficients.csv")
 
 #Finally, plot drag coefficients as a function of Reynolds number.
-Reyn <- (rho * velo[-1] * (0.7*2.54 %e% -2))
+Reyn <- (rho * velo[-1] * (0.7*2.54 %e% -2)) / (1.79 %e% -5)
 
 ggplot(data.frame(DragCoef = Dcoef, Reynolds = Reyn), aes(x = Reynolds, y = DragCoef)) +
   geom_point() +
