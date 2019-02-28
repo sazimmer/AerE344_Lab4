@@ -82,14 +82,19 @@ rm(i)
 
 datafilter <- array(data = NA, dim = c(nrow(data0Hz), ncol(data0Hz), length(dataNames)))
 #Makes an empty array of the same size as the data, with as many matrices as there is data.
+while(FALSE) {
 for(i in seq_along(dataNames)) {
   datafilter[,,i] <- sapply(X = seq_along(colnames(get(dataNames[i]))), FUN = function(X)
     {get(dataNames[i])[,X] > bsln[i,X]+(3*stddev[i,X]) || get(dataNames[i])[,X] < bsln[i,X]-(3*stddev[i,X])})
   #Check if the data is within desired range.
 }
+rm(i)
+} #Cutting off this portion of code as it could be producing undesired results.
 #An array is a three-dimensional matrix. It essentially stores one or more matrices.
 #If I want row 1, column 2 of matrix 3, then I call it with array[1,2,3].
-rm(i)
+for(i in seq_along(dataNames)) {
+  datafilter[,,i] <- sapply(seq_along(colnames(get(dataNames[i]))), function(X) get(dataNames[i])[,X] == -999999)
+}
 
 #Calculation to-do: average all data from all runs, plot pressure coefficient on the cylinder,
 #calculate drag coefficients, plot drag coefficients as a function of Reynolds number
@@ -176,3 +181,5 @@ ggplot(data.frame(DragCoef = Dcoef, Reynolds = Reyn), aes(x = Reynolds, y = Drag
   geom_point() +
   xlab("Reynolds Number (unitless)") +
   ylab("Drag Coefficient (unitless)")
+
+#HEY!! TRY REPLACING THE COEFFICIENT OF PRESSURE EQUATION WITH THE OTHER ONE!!
